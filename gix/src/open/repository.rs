@@ -328,6 +328,7 @@ impl ThreadSafeRepository {
                     object_hash: config.object_hash,
                     use_multi_pack_index: config.use_multi_pack_index,
                     current_dir: current_dir.to_owned().into(),
+                    ignore_alternates: false,
                 },
             )?),
             common_dir,

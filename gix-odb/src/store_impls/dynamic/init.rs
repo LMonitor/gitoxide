@@ -19,6 +19,8 @@ pub struct Options {
     /// The current directory of the process at the time of instantiation.
     /// If unset, it will be retrieved using `gix_fs::current_dir(false)`.
     pub current_dir: Option<std::path::PathBuf>,
+    /// Ignore alternate databases
+    pub ignore_alternates: bool,
 }
 
 impl Default for Options {
@@ -28,6 +30,7 @@ impl Default for Options {
             object_hash: Default::default(),
             use_multi_pack_index: true,
             current_dir: None,
+            ignore_alternates: false,
         }
     }
 }
@@ -77,6 +80,7 @@ impl Store {
             object_hash,
             use_multi_pack_index,
             current_dir,
+            ignore_alternates,
         }: Options,
     ) -> std::io::Result<Self> {
         let _span = gix_features::trace::detail!("gix_odb::Store::at()");
@@ -96,9 +100,13 @@ impl Store {
         let slot_count = match slots {
             Slots::Given(n) => n as usize,
             Slots::AsNeededByDiskState { multiplier, minimum } => {
-                let mut db_paths = crate::alternate::resolve(objects_dir.clone(), &current_dir)
-                    .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?;
-                db_paths.insert(0, objects_dir.clone());
+                let mut db_paths = vec![objects_dir.clone()];
+                if !ignore_alternates {
+                    db_paths.extend(
+                        crate::alternate::resolve(objects_dir.clone(), &current_dir)
+                            .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?,
+                    );
+                }
                 let num_slots = super::Store::collect_indices_and_mtime_sorted_by_size(db_paths, None, None)
                     .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?
                     .len();
@@ -127,6 +135,7 @@ impl Store {
             num_handles_stable: Default::default(),
             num_handles_unstable: Default::default(),
             num_disk_state_consolidation: Default::default(),
+            ignore_alternates,
         })
     }
 }

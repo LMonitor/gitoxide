@@ -242,6 +242,19 @@ fn alternate_dbs_query() -> crate::Result {
 }
 
 #[test]
+fn ignore_alternate_dbs_query() -> crate::Result {
+    let dir = gix_testtools::scripted_fixture_read_only_standalone("make_alternates_odb.sh")?;
+    let handle = gix_odb::at_opts(dir.join(".git/objects"), &mut None.into_iter(), gix_odb::store::init::Options {
+        ignore_alternates: true,
+        ..Default::default()
+    })?;
+
+    let alternates = handle.store_ref().alternate_db_paths()?;
+    assert_eq!(alternates.len(), 0, "no alternates");
+    Ok(())
+}
+
+#[test]
 fn object_replacement() -> crate::Result {
     let dir = gix_testtools::scripted_fixture_read_only_standalone("make_replaced_history.sh")?;
     let handle = gix_odb::at(dir.join(".git/objects"))?;

@@ -137,6 +137,8 @@ pub struct Store {
     use_multi_pack_index: bool,
     /// The hash kind to use for some operations
     object_hash: gix_hash::Kind,
+    /// Ignore alternates
+    ignore_alternates: bool,
 }
 
 /// Create a new cached handle to the object store with support for additional options.

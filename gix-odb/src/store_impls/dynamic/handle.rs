@@ -353,6 +353,7 @@ impl TryFrom<&super::Store> for super::Store {
                 object_hash: Default::default(),
                 use_multi_pack_index: false,
                 current_dir: s.current_dir.clone().into(),
+                ignore_alternates: false,
             },
         )
     }

@@ -205,9 +205,11 @@ impl super::Store {
         }
         self.num_disk_state_consolidation.fetch_add(1, Ordering::Relaxed);
 
-        let db_paths: Vec<_> = std::iter::once(objects_directory.to_owned())
-            .chain(crate::alternate::resolve(objects_directory.clone(), &self.current_dir)?)
-            .collect();
+        let mut db_paths = vec![objects_directory.to_owned()];
+
+        if !self.ignore_alternates {
+            db_paths.extend(crate::alternate::resolve(objects_directory.clone(), &self.current_dir)?);
+        }
 
         // turn db paths into loose object databases. Reuse what's there, but only if it is in the right order.
         let loose_dbs = if was_uninitialized
