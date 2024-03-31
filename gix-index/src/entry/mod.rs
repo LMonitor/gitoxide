@@ -6,6 +6,7 @@
 pub type Stage = u32;
 
 ///
+#[allow(clippy::empty_docs)]
 pub mod mode;
 
 mod flags;
@@ -13,14 +14,12 @@ pub(crate) use flags::at_rest;
 pub use flags::Flags;
 
 ///
+#[allow(clippy::empty_docs)]
 pub mod stat;
 mod write;
 
 use bitflags::bitflags;
 
-// TODO: we essentially treat this as an enum with the only exception being
-//      that `FILE_EXECUTABLE.contains(FILE)` works might want to turn this into an
-//      enum proper
 bitflags! {
     /// The kind of file of an entry.
     #[derive(Copy, Clone, Debug, PartialEq, Eq)]
