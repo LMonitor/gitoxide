@@ -1,6 +1,6 @@
 [package]
 name = "gix-transport"
-version = "0.41.3"
+version = "0.42.0"
 repository = "https://github.com/Byron/gitoxide"
 license = "MIT OR Apache-2.0"
 description = "A crate of the gitoxide project dedicated to implementing the git transport layer"
@@ -30,7 +30,7 @@ http-client = [
 ]
 ## Implies `http-client`, and adds support for the http and https transports using the Rust bindings for `libcurl`.
 http-client-curl = ["curl", "http-client"]
-## Implies `http-client-curl` and enables `rustls` for creationg `https://` connections.
+## Implies `http-client-curl` and enables `rustls` for creating `https://` connections.
 http-client-curl-rust-tls = ["http-client-curl", "curl/rustls"]
 ### Implies `http-client` and adds support for http and https transports using the blocking version of `reqwest`.
 http-client-reqwest = ["reqwest", "http-client"]
@@ -79,7 +79,7 @@ required-features = ["async-client"]
 [dependencies]
 gix-command = { version = "^0.3.6", path = "../gix-command" }
 gix-features = { version = "^0.38.1", path = "../gix-features" }
-gix-url = { version = "^0.27.2", path = "../gix-url" }
+gix-url = { version = "^0.27.3", path = "../gix-url" }
 gix-sec = { version = "^0.10.6", path = "../gix-sec" }
 gix-packetline = { version = "^0.17.5", path = "../gix-packetline" }
 gix-credentials = { version = "^0.24.2", path = "../gix-credentials", optional = true }

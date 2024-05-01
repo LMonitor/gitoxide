@@ -199,10 +199,7 @@ mod submodule_status {
             let local_repo = repo.to_thread_local();
             let submodule_paths = match local_repo.submodules()? {
                 Some(sm) => {
-                    let mut v: Vec<_> = sm
-                        .filter(|sm| sm.is_active().unwrap_or_default())
-                        .filter_map(|sm| sm.path().ok().map(Cow::into_owned))
-                        .collect();
+                    let mut v: Vec<_> = sm.filter_map(|sm| sm.path().ok().map(Cow::into_owned)).collect();
                     v.sort();
                     v
                 }
@@ -271,7 +268,8 @@ mod submodule_status {
 ///
 /// ### Submodules
 ///
-/// Note that submodules can be set to 'inactive' which automatically excludes them from the status operation.
+/// Note that submodules can be set to 'inactive', which will not exclude them from the status operation, similar to
+/// how `git status` includes them.
 ///
 /// ### Index Changes
 ///
@@ -281,7 +279,7 @@ mod submodule_status {
 /// ### Parallel Operation
 ///
 /// Note that without the `parallel` feature, the iterator becomes 'serial', which means all status will be computed in advance
-/// and it's non-interruptable, yielding worse performance for is-dirty checks for instance as interruptions won't happen.
+/// and it's non-interruptible, yielding worse performance for is-dirty checks for instance as interruptions won't happen.
 /// It's a crutch that is just there to make single-threaded applications possible at all, as it's not really an iterator
 /// anymore. If this matters, better run [Repository::index_worktree_status()] by hand as it provides all control one would need,
 /// just not as an iterator.
@@ -613,7 +611,10 @@ pub mod iter {
         ///
         /// * `patterns`
         ///     - Optional patterns to use to limit the paths to look at. If empty, all paths are considered.
-        pub fn into_index_worktree_iter(self, patterns: Vec<BString>) -> Result<index_worktree::Iter, Error> {
+        pub fn into_index_worktree_iter(
+            self,
+            patterns: impl IntoIterator<Item = BString>,
+        ) -> Result<index_worktree::Iter, Error> {
             let index = match self.index {
                 None => IndexPersistedOrInMemory::Persisted(self.repo.index_or_empty()?),
                 Some(index) => index,
@@ -634,6 +635,7 @@ pub mod iter {
             {
                 let (tx, rx) = std::sync::mpsc::channel();
                 let mut collect = Collect { tx };
+                let patterns: Vec<_> = patterns.into_iter().collect();
                 let join = std::thread::Builder::new()
                     .name("gix::status::index_worktree::iter::producer".into())
                     .spawn({

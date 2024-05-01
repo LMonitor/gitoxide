@@ -172,10 +172,9 @@ pub fn path(
         out.property = entry::Property::DotGit.into();
         return Ok(out);
     }
-    let pathspec_could_match = rela_path.is_empty()
-        || ctx
-            .pathspec
-            .can_match_relative_path(rela_path.as_bstr(), disk_kind.map(|ft| ft.is_dir()));
+    let pathspec_could_match = ctx
+        .pathspec
+        .can_match_relative_path(rela_path.as_bstr(), disk_kind.map(|ft| ft.is_dir()));
     if !pathspec_could_match {
         return Ok(out.with_status(entry::Status::Pruned));
     }
@@ -249,7 +248,7 @@ pub fn path(
         return Ok(out.with_status(status).with_kind(kind, index_kind));
     }
 
-    debug_assert!(maybe_status.is_none(), "It only communicates a single stae right now");
+    debug_assert!(maybe_status.is_none(), "It only communicates a single state right now");
     if let Some(excluded) = ctx
         .excludes
         .as_mut()
