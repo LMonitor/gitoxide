@@ -434,6 +434,10 @@ pub mod clone {
         /// The url of the remote to connect to, like `https://github.com/byron/gitoxide`.
         pub remote: OsString,
 
+        /// The name of the reference to check out.
+        #[clap(long = "ref", value_parser = crate::shared::AsPartialRefName, value_name = "REF_NAME")]
+        pub ref_name: Option<gix::refs::PartialName>,
+
         /// The directory to initialize with the new repository and to which all data should be written.
         pub directory: Option<PathBuf>,
     }
@@ -508,10 +512,17 @@ pub mod remote {
 }
 
 pub mod mailmap {
+    use gix::bstr::BString;
+
     #[derive(Debug, clap::Subcommand)]
     pub enum Subcommands {
         /// Print all entries in configured mailmaps, inform about errors as well.
         Entries,
+        /// Print the canonical form of contacts according to the configured mailmaps.
+        Check {
+            /// One or more `Name <email>` or `<email>` to pass through the mailmap.
+            contacts: Vec<BString>,
+        },
     }
 }
 

@@ -404,6 +404,7 @@ pub fn main() -> Result<()> {
             handshake_info,
             bare,
             no_tags,
+            ref_name,
             remote,
             shallow,
             directory,
@@ -413,6 +414,7 @@ pub fn main() -> Result<()> {
                 bare,
                 handshake_info,
                 no_tags,
+                ref_name,
                 shallow: shallow.into(),
             };
             prepare_and_run(
@@ -1212,6 +1214,17 @@ pub fn main() -> Result<()> {
                 None,
                 move |_progress, out, err| {
                     core::repository::mailmap::entries(repository(Mode::Lenient)?, format, out, err)
+                },
+            ),
+            mailmap::Subcommands::Check { contacts } => prepare_and_run(
+                "mailmap-check",
+                trace,
+                verbose,
+                progress,
+                progress_keep_open,
+                None,
+                move |_progress, out, err| {
+                    core::repository::mailmap::check(repository(Mode::Lenient)?, format, contacts, out, err)
                 },
             ),
         },
